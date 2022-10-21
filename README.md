@@ -1,6 +1,9 @@
 ## container-corretto-jdk11-ubuntu
 方便中国境内使用的环境(ubuntu:latest+corretto的jdk11)
 
+**[Docker Hub](https://hub.docker.com/r/ghostbone/corretto)**
+**[Github](https://github.com/GhostBone/container-corretto-jdk11-ubuntu)**
+
 - 基于官方Ubuntu最新镜像的tag
 - 时区统一设置为Asia/Shanghai
 - 环境变量配置终端可以256彩色显示
