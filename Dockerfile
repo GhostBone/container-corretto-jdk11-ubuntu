@@ -1,30 +1,30 @@
-FROM ubuntu:20.04
+FROM ubuntu:latest
+ENV TERM=xterm-256color LANG=C.UTF-8
+WORKDIR /root
 
-ENV JAVA_HOME=/usr/lib/jvm/java-11-amazon-corretto
-ENV CATALINA_HOME /usr/local/tomcat
-ENV PATH $CATALINA_HOME/bin:$PATH
-RUN mkdir -p "$CATALINA_HOME"
-WORKDIR $CATALINA_HOME
-
-RUN sed -i s@/archive.ubuntu.com/@/mirrors.aliyun.com/@g /etc/apt/sources.list \
-    && sed -i s@/security.ubuntu.com/@/mirrors.aliyun.com/@g /etc/apt/sources.list \
+    # sed -i s@/archive.ubuntu.com/@/mirrors.aliyun.com/@g /etc/apt/sources.list \
+    # sed -i s@/security.ubuntu.com/@/mirrors.aliyun.com/@g /etc/apt/sources.list \
+RUN apt-get update \
+    && apt-get upgrade -y \
+    && apt-get install -y --no-install-recommends vim wget ca-certificates gnupg2 tzdata \
+    && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
+    && wget -O ./corretto.key https://apt.corretto.aws/corretto.key \
+    && gpg --no-default-keyring --keyring ./corretto-key.gpg --import ./corretto.key \
+    && gpg --no-default-keyring --keyring ./corretto-key.gpg --export > ./corretto.gpg \
+    && cp ./corretto.gpg /etc/apt/trusted.gpg.d/corretto.gpg \
+    && rm ./corretto* \
+    && rm -r ./.gnupg \
+    && apt-get remove -y wget ca-certificates gnupg2 \
     && apt-get clean \
+    && apt-get autoremove -y \
+    && echo 'deb https://apt.corretto.aws stable main' >> /etc/apt/sources.list \
     && apt-get update \
-    && apt-get -y upgrade \
-    && apt-get -y install vim wget gnupg2 tzdata \
-    && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime\
-    && echo 'Asia/Shanghai' >/etc/timezone \
-    && wget -O- https://apt.corretto.aws/corretto.key | apt-key add - \
-    && echo 'deb https://apt.corretto.aws stable main' >>/etc/apt/sources.list \
-    && apt-get update \
-    && apt-get install -y java-11-amazon-corretto-jdk \
+    && apt-get install -y --no-install-recommends java-11-amazon-corretto-jdk \
+    && echo '----------------jdk----------------' \
     && java --version \
-    && wget -O tomcat.tar.gz 'https://dlcdn.apache.org/tomcat/tomcat-9/v9.0.60/bin/apache-tomcat-9.0.60.tar.gz' \
-    && tar -xvf tomcat.tar.gz --strip-components=1 \
-    && rm bin/*.bat \
-    && rm tomcat.tar.gz* \
-    && mv -f webapps webapps.back \
-    && mkdir webapps
+    && echo '--------------encoding-------------' \
+    && locale \
+    && echo '----------------now----------------' \
+    && date
 
-EXPOSE 8080
-CMD ["catalina.sh", "run"]
+CMD ["bash"]
